@@ -1,0 +1,43 @@
+{
+	"files": [],
+	"references": [
+		{ "path": "packages/shared" },
+		{ "path": "packages/core" },
+		{ "path": "packages/dashboard" },
+		{ "path": "bots/client" },
+		{ "path": "bots/helper" }
+	],
+	"compilerOptions": {
+		"target": "ES2022",
+		"lib": ["ES2023"],
+		"module": "ES2022",
+		"moduleResolution": "Node",
+		"resolveJsonModule": true,
+		"importHelpers": true,
+		"pretty": true,
+		"noEmitOnError": true,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"noImplicitAny": false,
+		"strictNullChecks": true,
+		"skipDefaultLibCheck": true,
+		"skipLibCheck": true,
+
+		// Project references
+		"composite": true,
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+
+		"baseUrl": ".",
+		"paths": {
+			"@projectdiscord/core": ["packages/core/src"],
+			"@projectdiscord/core/*": ["packages/core/src/*"],
+			"@projectdiscord/shared": ["packages/shared/src"],
+			"@projectdiscord/shared/*": ["packages/shared/src/*"],
+			"@projectdiscord/bot": ["bots/client/src/index.ts"]
+		}
+	}
+}

@@ -1,0 +1,39 @@
+{
+	"name": "bot-template",
+	"version": "1.0.0",
+	"description": "TypeScript discord.js bot template by Project Discord",
+	"private": true,
+	"workspaces": [
+		"packages/*",
+		"bots/*",
+		"tools/*"
+	],
+	"homepage": "https://github.com/ProjectDiscord/bot-template#readme",
+	"bugs": {
+		"url": "https://github.com/ProjectDiscord/bot-template/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ProjectDiscord/bot-template.git"
+	},
+	"license": "MIT",
+	"author": "ProjectDiscord",
+	"scripts": {
+		"build": "turbo run build --force",
+		"dev": "turbo run dev --parallel",
+		"start:bot": "node ./bots/client/dist/index.js",
+		"start:dashboard": "node ./packages/dashboard/dist/index.js",
+		"start:helper": "node ./bots/helper/dist/index.js",
+		"lint": "turbo run lint",
+		"format": "turbo run format"
+	},
+	"devDependencies": {
+		"prettier": "^3.6.2",
+		"prisma": "^6.16.2",
+		"turbo": "^2.5.6"
+	},
+	"dependencies": {
+		"@prisma/client": "^6.16.2"
+	},
+	"packageManager": "npm@11.6.0"
+}

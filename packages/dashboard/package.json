@@ -1,0 +1,34 @@
+{
+	"name": "@projectdiscord/dashboard",
+	"version": "1.0.0",
+	"description": "",
+	"homepage": "https://github.com/ProjectDiscord/bot-template#readme",
+	"bugs": {
+		"url": "https://github.com/ProjectDiscord/bot-template/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ProjectDiscord/bot-template.git"
+	},
+	"license": "MIT",
+	"author": "ProjectDiscord",
+	"type": "module",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "tsc --build"
+	},
+	"devDependencies": {
+		"@types/node": "^24.5.1",
+		"typescript": "^5.9.2"
+	},
+	"dependencies": {
+		"@dbd-soft-ui/logs": "^1.1.2",
+		"@keyv/mysql": "^2.1.6",
+		"dbd-soft-ui": "^1.7.40-beta.1",
+		"discord-dashboard": "^2.3.62",
+		"discord.js": "^14.22.1",
+		"dotenv": "^17.2.2"
+	},
+	"packageManager": "npm@11.6.0"
+}
