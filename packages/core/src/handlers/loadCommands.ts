@@ -45,6 +45,7 @@ async function processFolder(
 				logger.warn(`Invalid slash command skipped: ${filePath}`);
 				return;
 			}
+
 			client.slashCommands.set(slashCommand.data.name, slashCommand);
 			(slashCommand.isDeveloperOnly ? output.dev : output.global).push(slashCommand.data.toJSON());
 		}),
@@ -73,13 +74,42 @@ export async function loadCommands(
 		const rest = new REST({ version: '10' }).setToken(token);
 
 		try {
+			// ----------------- GLOBAL COMMANDS -----------------
+			const currentGlobal = await rest.get(Routes.applicationCommands(clientId));
+			const currentGlobalIds = (currentGlobal as any[]).map((cmd) => cmd.id);
+
+			// Delete old global commands
+			for (const id of currentGlobalIds) {
+				await rest.delete(Routes.applicationCommand(clientId, id));
+			}
+
+			// Register new global commands
 			if (output.global.length) {
 				await rest.put(Routes.applicationCommands(clientId), { body: output.global });
 				logger.info(`Registered ${output.global.length} global slash commands.`);
 			}
 
-			if (guilds?.length && output.dev.length) {
-				for (const guild of guilds) {
+			// ----------------- DEV / GUILD COMMANDS -----------------
+			let allGuilds: ObjectNameIDArray[] = guilds || [];
+
+			const supporterGuilds = await client.prisma.supportGuilds.findMany({
+				select: { guildId: true, guildName: true },
+			});
+
+			if (supporterGuilds.length) {
+				allGuilds = [...allGuilds, ...supporterGuilds.map((g) => ({ id: g.guildId, name: g.guildName }))];
+				logger.info(`Loaded ${supporterGuilds.length} supporter guilds from database.`);
+			}
+
+			for (const guild of allGuilds) {
+				// Clear old guild commands first
+				const guildCommands = await rest.get(Routes.applicationGuildCommands(clientId, guild.id));
+				for (const cmd of guildCommands as any[]) {
+					await rest.delete(Routes.applicationGuildCommand(clientId, guild.id, cmd.id));
+				}
+
+				// Register new dev commands
+				if (output.dev.length) {
 					await rest.put(Routes.applicationGuildCommands(clientId, guild.id), { body: output.dev });
 					logger.info(`Registered ${output.dev.length} dev slash commands in guild ${guild.name} (${guild.id})`);
 				}

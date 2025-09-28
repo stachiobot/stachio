@@ -69,9 +69,9 @@ export const config: ProjectInterface = {
 		redirectUri: process.env.DASHBOARD_REDIRECT_URI as string,
 		license: process.env.DASHBOARD_LICENSE as string,
 		ownerIDs: ['711712752246325343'],
-		websiteName: 'Bot Template',
+		websiteName: 'Stachio.dk',
 		colorScheme: 'pink',
-		supportMail: 'bottemplate@projectdiscord.dk',
+		supportMail: 'support@stachio.dk',
 
 		supportServerUrl: 'https://discord.gg/invite',
 		supportSlashUrl: '/support',
@@ -87,15 +87,15 @@ export const config: ProjectInterface = {
 		},
 		premium: {
 			enabled: true,
-			title: 'Want more from ProjectDiscord?',
+			title: 'Want more from Stachio?',
 			description: 'Check out premium features below!',
 			buttonText: 'Become Premium',
 			buttonUrl: 'https://github.com/projectdiscord',
 		},
 		meta: {
-			description: 'smh its a bot template',
+			description: 'smh its a bot',
 			ogImage: '',
-			twitterHandle: '@projectdiscord',
+			twitterHandle: '@stachio',
 		},
 		rateLimits: {
 			windowMs: 15 * 60 * 1000,
@@ -117,8 +117,12 @@ export const config: ProjectInterface = {
 	},
 	guilds: [
 		{
-			name: 'Project Discord',
-			id: '1396235829579485214',
+			name: 'Stachio',
+			id: '1413898198266941522',
+		},
+		{
+			name: 'Stachio Development',
+			id: '1415312628175339553',
 		},
 	],
 	colors: {
