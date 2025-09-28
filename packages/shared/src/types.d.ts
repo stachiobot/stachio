@@ -1,4 +1,12 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, ClientEvents, RESTEvents, Message } from 'discord.js';
+import {
+	SlashCommandBuilder,
+	ChatInputCommandInteraction,
+	ClientEvents,
+	RESTEvents,
+	Message,
+	SlashCommandSubcommandsOnlyBuilder,
+	InteractionResponse,
+} from 'discord.js';
 
 export type ObjectNameIDArray = Array[{ name: string; id: string }];
 
@@ -19,8 +27,11 @@ export interface EventInterface<K extends keyof ClientEvents | keyof RESTEvents 
 export interface SlashCommandInterface {
 	cooldown: number;
 	isDeveloperOnly: boolean;
-	data: SlashCommandBuilder;
-	execute: (client: any, interaction: ChatInputCommandInteraction) => Promise<void> | void;
+	data: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder;
+	execute: (
+		client: any,
+		interaction: ChatInputCommandInteraction,
+	) => void | Promise<void | Message | InteractionResponse>;
 }
 
 export interface PrefixCommandInterface {
