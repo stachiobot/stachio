@@ -7,7 +7,8 @@ const command: SlashCommandInterface = {
 	isDeveloperOnly: false,
 	data: new SlashCommandBuilder().setName('ping').setDescription('Replies with Pong!'),
 	async execute(client: BaseClient, interaction: ChatInputCommandInteraction) {
-		await interaction.reply({ content: '🏓 Pong!', flags: ['Ephemeral'] });
+		await interaction.deferReply({ flags: ['Ephemeral'] });
+		return interaction.editReply({ content: '🏓 Pong!' });
 	},
 };
 

@@ -7,6 +7,115 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model SupportGuilds {
+  guildId    String       @unique
+  guildName  String
+  language   String       @default("en-US")
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  StaffUsers StaffUsers[]
+}
+
 model GuildConfig {
-  guildId String @unique
+  guildId            String          @unique
+  guildName          String?
+  language           String          @default("en-US")
+  broadcastChannelId String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  WatchdogConfig     WatchdogConfig?
+}
+
+model WatchdogConfig {
+  id      Int         @id @default(autoincrement())
+  guildId String      @unique
+  guild   GuildConfig @relation(fields: [guildId], references: [guildId])
+
+  generalPunishment     PunishmentType @default(BAN)
+  fivemPunishment       PunishmentType @default(WARN)
+  discordPunishment     PunishmentType @default(KICK)
+  robloxPunishment      PunishmentType @default(WARN)
+  otherGamePunishment   PunishmentType @default(WARN)
+  marketplacePunishment PunishmentType @default(BAN)
+
+  logChannelId String?
+  roleId       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PunishmentType {
+  NONE
+  WARN
+  ROLE
+  KICK
+  BAN
+}
+
+model BlacklistedUser {
+  id        Int    @id @default(autoincrement())
+  discordId String @unique // The user's Discord ID
+  username  String // Discord username (tag at the time)
+
+  blacklists BlacklistEntry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BlacklistEntry {
+  id     Int             @id @default(autoincrement())
+  user   BlacklistedUser @relation(fields: [userId], references: [id])
+  userId Int
+
+  usertype   UserType        @default(General) // General blacklist vs. found in FiveM
+  status     BlacklistStatus @default(PERMANENT)
+  community  String? // Name of the FiveM community/server
+  reason     String? // Why the user was flagged
+  reportedBy String? // Discord ID of the staff/mod who flagged
+  evidence   String? // Screenshot/log/clip link
+
+  active    Boolean   @default(true) // Still valid?
+  expiresAt DateTime? // Only used for TEMP bans
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+enum UserType {
+  General // Global / cross-community blacklist
+  FiveM // Found or banned in a FiveM community
+  Discord // Discord-related offenses (e.g., raids, spam, scam)
+  Roblox // Roblox community issues
+  OtherGame // Catch-all for other game communities
+  Marketplace // Scamming in trades/marketplaces
+}
+
+enum BlacklistStatus {
+  PERMANENT // Never expires
+  TEMPORARY // Has an expiresAt
+  INDEFINITE // No expiry set, but not marked permanent
+}
+
+model StaffUsers {
+  id       Int        @id @default(autoincrement())
+  guildId  String
+  userId   String
+  username String?
+  role     StaffRoles @default(Trial_Moderator)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  guild SupportGuilds @relation(fields: [guildId], references: [guildId])
+}
+
+enum StaffRoles {
+  Owner
+  Senior_Administrator
+  Administrator
+  Senior_Moderator
+  Moderator
+  Trial_Moderator
+  Retired
 }
