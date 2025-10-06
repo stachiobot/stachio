@@ -1,6 +1,7 @@
 {
 	"files": [],
 	"references": [
+		{ "path": "packages/processer" },
 		{ "path": "packages/shared" },
 		{ "path": "packages/core" },
 		{ "path": "packages/dashboard" },
@@ -37,7 +38,13 @@
 			"@projectdiscord/core/*": ["packages/core/src/*"],
 			"@projectdiscord/shared": ["packages/shared/src"],
 			"@projectdiscord/shared/*": ["packages/shared/src/*"],
-			"@projectdiscord/bot": ["bots/client/src/index.ts"]
+			"@projectdiscord/dashboard": ["packages/dashboard/src"],
+			"@projectdiscord/dashboard/*": ["packages/dashboard/src/*"],
+			"@projectdiscord/processer": ["packages/processer/src"],
+			"@projectdiscord/processer/*": ["packages/processer/src/*"],
+			"@projectdiscord/bot": ["bots/client/src/index.ts"],
+			"@projectdiscord/helper": ["bots/helper/src/index.ts"]
 		}
-	}
+	},
+	"types": ["node"]
 }
