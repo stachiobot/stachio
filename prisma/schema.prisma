@@ -21,9 +21,34 @@ model GuildConfig {
   guildName          String?
   language           String          @default("en-US")
   broadcastChannelId String?
+  errorLogChannelId  String?
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
   WatchdogConfig     WatchdogConfig?
+
+  // 🔑 Premium fields
+  premiumTier         PremiumTier @default(Free)
+  premiumExpiresAt    DateTime?
+  redeemedPremiumCode String?
+
+  // ⬇ Blacklist check usage tracking
+  blacklistCheckUsage     Int      @default(0)
+  blacklistCheckLastReset DateTime @default(now())
+}
+
+model PremiumCode {
+  code      String      @id @default(cuid())
+  tier      PremiumTier
+  duration  Int // In days
+  createdAt DateTime    @default(now())
+  redeemed  Boolean     @default(false)
+}
+
+enum PremiumTier {
+  Free
+  Silver
+  Gold
+  Platinum
 }
 
 model WatchdogConfig {
@@ -31,12 +56,12 @@ model WatchdogConfig {
   guildId String      @unique
   guild   GuildConfig @relation(fields: [guildId], references: [guildId])
 
-  generalPunishment     PunishmentType @default(BAN)
+  generalPunishment     PunishmentType @default(WARN)
   fivemPunishment       PunishmentType @default(WARN)
-  discordPunishment     PunishmentType @default(KICK)
+  discordPunishment     PunishmentType @default(WARN)
   robloxPunishment      PunishmentType @default(WARN)
   otherGamePunishment   PunishmentType @default(WARN)
-  marketplacePunishment PunishmentType @default(BAN)
+  marketplacePunishment PunishmentType @default(WARN)
 
   logChannelId String?
   roleId       String?
@@ -55,8 +80,8 @@ enum PunishmentType {
 
 model BlacklistedUser {
   id        Int    @id @default(autoincrement())
-  discordId String @unique // The user's Discord ID
-  username  String // Discord username (tag at the time)
+  discordId String @unique
+  username  String
 
   blacklists BlacklistEntry[]
 
@@ -69,32 +94,48 @@ model BlacklistEntry {
   user   BlacklistedUser @relation(fields: [userId], references: [id])
   userId Int
 
-  usertype   UserType        @default(General) // General blacklist vs. found in FiveM
+  usertype   UserType        @default(General)
   status     BlacklistStatus @default(PERMANENT)
-  community  String? // Name of the FiveM community/server
-  reason     String? // Why the user was flagged
-  reportedBy String? // Discord ID of the staff/mod who flagged
-  evidence   String? // Screenshot/log/clip link
+  community  String?
+  reason     String? 
+  reportedBy String?
+  evidence   String?         @db.LongText
 
-  active    Boolean   @default(true) // Still valid?
-  expiresAt DateTime? // Only used for TEMP bans
+  active    Boolean   @default(true)
+  expiresAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
 
 enum UserType {
-  General // Global / cross-community blacklist
-  FiveM // Found or banned in a FiveM community
-  Discord // Discord-related offenses (e.g., raids, spam, scam)
-  Roblox // Roblox community issues
-  OtherGame // Catch-all for other game communities
-  Marketplace // Scamming in trades/marketplaces
+  General
+  FiveM
+  Roblox
+  OtherGame
+  Marketplace
+  Scammer
+  Impersonator
+  Advertiser
+  Phisher
+  DataLeaker
+  ExploitAbuser
+  Cheater
+  DeveloperAbuse
+  ToxicBehavior
+  AltAccount
+  Chargebacker
+  FraudulentSeller
+  ExploitDeveloper
+  DDoSer
+  ServerRaider
+  NSFWDistributor
+  AccountSeller
 }
 
 enum BlacklistStatus {
-  PERMANENT // Never expires
-  TEMPORARY // Has an expiresAt
-  INDEFINITE // No expiry set, but not marked permanent
+  PERMANENT
+  TEMPORARY
+  INDEFINITE
 }
 
 model StaffUsers {
@@ -118,4 +159,26 @@ enum StaffRoles {
   Moderator
   Trial_Moderator
   Retired
+}
+
+model Report {
+  id               Int          @id @default(autoincrement())
+  reporterId       String
+  reporterUsername String
+  reportedUser     String
+  reason           String
+  evidence         String?
+  channelId        String?      @unique
+  status           ReportStatus @default(OPEN)
+  closedBy         String?
+  closedReason     String?
+  closedAt         DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ReportStatus {
+  OPEN
+  CLOSED
 }
