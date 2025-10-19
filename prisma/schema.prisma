@@ -32,8 +32,9 @@ model GuildConfig {
   redeemedPremiumCode String?
 
   // ⬇ Blacklist check usage tracking
-  blacklistCheckUsage     Int      @default(0)
-  blacklistCheckLastReset DateTime @default(now())
+  blacklistCheckUsage     Int          @default(0)
+  blacklistCheckLastReset DateTime     @default(now())
+  Appeal                  Appeal[]
 }
 
 model PremiumCode {
@@ -181,4 +182,43 @@ model Report {
 enum ReportStatus {
   OPEN
   CLOSED
+}
+
+/// 🏆 REPUTATION / TRUST SCORE SYSTEM
+model UserReputation {
+  id         Int      @id @default(autoincrement())
+  userId     String   @unique
+  username   String?
+  trustScore Int      @default(100) // 0-100 baseline
+  strikes    Int      @default(0)
+  positive   Int      @default(0)
+  negative   Int      @default(0)
+  notes      String?  @db.LongText
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+}
+
+/// 🧾 APPEAL SYSTEM
+model Appeal {
+  id         Int          @id @default(autoincrement())
+  userId     String
+  username   String?
+  guildId    String?
+  caseId     Int?
+  reason     String
+  evidence   String?      @db.LongText
+  status     AppealStatus @default(PENDING)
+  reviewedBy String?
+  reviewedAt DateTime?
+  response   String?      @db.LongText
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  guild GuildConfig? @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+}
+
+enum AppealStatus {
+  PENDING
+  APPROVED
+  DENIED
 }
