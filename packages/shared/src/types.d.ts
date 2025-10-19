@@ -6,6 +6,7 @@ import {
 	Message,
 	SlashCommandSubcommandsOnlyBuilder,
 	InteractionResponse,
+	SlashCommandOptionsOnlyBuilder,
 } from 'discord.js';
 
 export type ObjectNameIDArray = Array[{ name: string; id: string }];
@@ -15,19 +16,18 @@ export interface EventInterface<K extends keyof ClientEvents | keyof RESTEvents 
 	options?: { once?: boolean; rest?: boolean };
 	execute: (
 		...args: K extends 'interactionCreate'
-			? [client: any, interaction: ChatInputCommandInteraction]
+			? [client: any, interaction: Interaction]
 			: K extends keyof ClientEvents
 				? [client: any, ...ClientEvents[K]]
 				: K extends keyof RESTEvents
 					? [client: any, ...RESTEvents[K]]
 					: [client: any, ...any[]]
-	) => void | Promise<void>;
+	) => any | Promise<any>;
 }
-
 export interface SlashCommandInterface {
 	cooldown: number;
 	isDeveloperOnly: boolean;
-	data: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder;
+	data: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder | SlashCommandOptionsOnlyBuilder;
 	execute: (
 		client: any,
 		interaction: ChatInputCommandInteraction,

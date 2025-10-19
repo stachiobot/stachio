@@ -131,6 +131,6 @@ export const config: ProjectInterface = {
 		warning: 0xfaa61a,
 		info: 0x5865f2,
 		secondary: 0x37373d,
-		primary: 0x5865f2,
+		primary: 0xaac49b,
 	},
 };

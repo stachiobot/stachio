@@ -1,4 +1,4 @@
-import { BaseClient } from '../index.js';
+import { BaseClient } from '@projectdiscord/core';
 import { EventInterface } from '@projectdiscord/shared';
 import path from 'node:path';
 import { readdirSync, existsSync } from 'node:fs';

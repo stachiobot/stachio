@@ -1,5 +1,5 @@
 import { EmbedBuilder, WebhookClient } from 'discord.js';
-import { BaseClient, logger } from '../index.js';
+import { BaseClient, logger } from '@projectdiscord/core';
 
 interface DevNotificationOptions {
 	webhookUrl?: string;

@@ -25,7 +25,7 @@
 	},
 	"dependencies": {
 		"@prisma/client": "^6.16.2",
-		"discord.js": "^14.22.1",
+		"discord.js": "^14.23.2",
 		"dotenv": "^17.2.2",
 		"prisma-error-enum": "^0.1.3"
 	},

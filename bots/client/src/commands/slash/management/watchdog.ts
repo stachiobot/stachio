@@ -1,6 +1,13 @@
 import { SlashCommandInterface } from '@projectdiscord/shared';
-import { BaseClient } from '@projectdiscord/core';
-import { SlashCommandBuilder, ChatInputCommandInteraction, ChannelType, TextChannel, Role } from 'discord.js';
+import { BaseClient, permissionGuard } from '@projectdiscord/core';
+import {
+	SlashCommandBuilder,
+	ChatInputCommandInteraction,
+	ChannelType,
+	Role,
+	PermissionsBitField,
+	TextChannel,
+} from 'discord.js';
 import { PunishmentType } from '@prisma/client';
 
 const command: SlashCommandInterface = {
@@ -61,14 +68,12 @@ const command: SlashCommandInterface = {
 				),
 		),
 	async execute(client: BaseClient, interaction: ChatInputCommandInteraction) {
+		await interaction.deferReply({ flags: ['Ephemeral'] });
 		const sub = interaction.options.getSubcommand();
-
-		// Use client.prisma
 		const prisma = client.prisma;
 
 		if (sub === 'setup') {
-			// Create initial guild config if missing
-			const guildConfig = await prisma.guildConfig.upsert({
+			await prisma.guildConfig.upsert({
 				where: { guildId: interaction.guildId! },
 				update: {},
 				create: {
@@ -88,20 +93,17 @@ const command: SlashCommandInterface = {
 				include: { WatchdogConfig: true },
 			});
 
-			await interaction.reply({ content: '✅ Watchdog setup completed!', ephemeral: true });
+			await interaction.editReply('`✅` Watchdog setup completed!');
 			return;
 		}
 
-		// Fetch existing config
 		const guildConfig = await prisma.guildConfig.findUnique({
 			where: { guildId: interaction.guildId! },
 			include: { WatchdogConfig: true },
 		});
+
 		if (!guildConfig?.WatchdogConfig) {
-			await interaction.reply({
-				content: '❌ Watchdog is not set up yet. Use /watchdog setup first.',
-				ephemeral: true,
-			});
+			await interaction.editReply('`❌` Watchdog is not set up yet. Use /watchdog setup first.');
 			return;
 		}
 
@@ -126,21 +128,45 @@ const command: SlashCommandInterface = {
 				data: { [field]: punishment },
 			});
 
-			await interaction.reply({ content: `✅ Punishment for ${usertype} set to ${punishment}`, ephemeral: true });
+			await interaction.editReply(`\`✅\` Punishment for ${usertype} set to ${punishment}`);
 		} else if (sub === 'setrole') {
 			const role = interaction.options.getRole('role', true) as Role;
+
+			const check = await permissionGuard({
+				action: `Assign ${role.name}`,
+				botMember: await interaction.guild?.members.fetchMe()!,
+				targetRole: role,
+				requiredPerms: [PermissionsBitField.Flags.ManageRoles],
+			});
+
+			if (check !== true) {
+				return interaction.editReply(check);
+			}
+
 			await prisma.watchdogConfig.update({
 				where: { id: watchdog.id },
 				data: { roleId: role.id },
 			});
-			await interaction.reply({ content: `✅ Role for ROLE punishment set to ${role.name}`, ephemeral: true });
+			await interaction.editReply(`\`✅\` Role for ROLE punishment set to ${role.name}`);
 		} else if (sub === 'setlog') {
-			const channel = interaction.options.getChannel('channel', true) as TextChannel;
+			const channel = interaction.options.getChannel('channel', true);
+
+			const check = await permissionGuard({
+				action: `Assigned new log channel ${channel.name}`,
+				botMember: await interaction.guild?.members.fetchMe()!,
+				channel: channel as TextChannel,
+				requiredPerms: [PermissionsBitField.Flags.ManageChannels],
+			});
+
+			if (check !== true) {
+				return interaction.editReply(check);
+			}
+
 			await prisma.watchdogConfig.update({
 				where: { id: watchdog.id },
 				data: { logChannelId: channel.id },
 			});
-			await interaction.reply({ content: `✅ Log channel set to ${channel.name}`, ephemeral: true });
+			await interaction.editReply(`\`✅\` Log channel set to ${channel.name}`);
 		}
 	},
 };

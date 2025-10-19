@@ -25,10 +25,13 @@
 	},
 	"dependencies": {
 		"@prisma/client": "^6.16.2",
+		"body-parser": "^1.20.3",
 		"chalk": "^5.6.2",
 		"dayjs": "^1.11.18",
 		"discord.js": "^14.22.1",
 		"dotenv": "^17.2.2",
+		"helmet": "^8.1.0",
+		"morgan": "^1.10.1",
 		"node-cron": "^4.2.1",
 		"prisma-error-enum": "^0.1.3"
 	},

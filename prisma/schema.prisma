@@ -97,7 +97,7 @@ model BlacklistEntry {
   usertype   UserType        @default(General)
   status     BlacklistStatus @default(PERMANENT)
   community  String?
-  reason     String? 
+  reason     String?
   reportedBy String?
   evidence   String?         @db.LongText
 

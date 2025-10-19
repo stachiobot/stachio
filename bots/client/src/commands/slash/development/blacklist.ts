@@ -7,14 +7,9 @@ import {
 	deleteBlacklistedUser,
 	getUserBlacklistEntries,
 	getBlacklistEntryById,
+	scanGuild,
 } from '@projectdiscord/core';
-import {
-	SlashCommandBuilder,
-	ChatInputCommandInteraction,
-	SlashCommandSubcommandsOnlyBuilder,
-	PermissionFlagsBits,
-	EmbedBuilder,
-} from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, EmbedBuilder, Guild } from 'discord.js';
 
 const command: SlashCommandInterface = {
 	cooldown: 5,
@@ -87,7 +82,13 @@ const command: SlashCommandInterface = {
 				.setName('info')
 				.setDescription('Get detailed info about a specific blacklist entry')
 				.addIntegerOption((o) => o.setName('entryid').setDescription('Entry ID').setRequired(true)),
-		) as SlashCommandSubcommandsOnlyBuilder,
+		)
+		.addSubcommand((sub) =>
+			sub
+				.setName('scan')
+				.setDescription('Scan the current guild for blacklisted users')
+				.addStringOption((options) => options.setName('guildid').setDescription('Guild ID').setRequired(true)),
+		),
 
 	async execute(client: BaseClient, interaction: ChatInputCommandInteraction) {
 		await interaction.deferReply({ flags: ['Ephemeral'] });
@@ -193,6 +194,15 @@ const command: SlashCommandInterface = {
 					.setTimestamp();
 
 				return interaction.editReply({ embeds: [embed] });
+			}
+
+			if (sub === 'scan') {
+				const guildId = interaction.options.getString('guildid');
+				const guild = await client.guilds.fetch(guildId!);
+				
+				await scanGuild(guild);
+
+				return interaction.editReply({ content: `\`🔍\` Scan completed for guild \`${interaction.guild!.name}\`.` });
 			}
 		} catch (err) {
 			console.error(err);

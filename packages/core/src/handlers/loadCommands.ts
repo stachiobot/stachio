@@ -1,4 +1,4 @@
-import { BaseClient, logger } from '../index.js';
+import { BaseClient, logger } from '@projectdiscord/core';
 import { SlashCommandInterface, ObjectNameIDArray } from '@projectdiscord/shared';
 import { ApplicationCommandDataResolvable, REST, Routes, Events } from 'discord.js';
 import path from 'node:path';
@@ -26,12 +26,17 @@ async function processFolder(
 
 			const command = (await import(pathToFileURL(filePath).toString())).default;
 
+			// ✅ Attach the file path to every loaded command
+			if (command) (command as any).filePath = filePath;
+
 			if (isPrefix) {
 				if (!command?.name || typeof command.execute !== 'function') {
 					logger.warn(`Invalid prefix command skipped: ${filePath}`);
 					return;
 				}
+
 				client.prefixCommands.set(command.name, command);
+
 				if (command.aliases && Array.isArray(command.aliases)) {
 					for (const alias of command.aliases) {
 						client.prefixCommands.set(alias, command);

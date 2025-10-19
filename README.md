@@ -8,7 +8,7 @@ This project uses **Turborepo** for workspace management and a clean modular str
 ## 📦 Structure
 
 ```
-bot-template/
+stachio/
 │
 ├─ package.json               # Root config (workspaces, scripts, dependencies)
 ├─ tsconfig.json              # Shared TypeScript config

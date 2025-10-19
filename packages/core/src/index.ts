@@ -8,10 +8,15 @@ export * from './logger.js';
 // Version Functions
 export * from './version.js';
 
-// Functions
-export * from './functions/prismaUtils.js';
-export * from './functions/staffUtils.js';
-export * from './functions/watchdogUtils.js';
+// Utils
+export * from './utils/guildErrLogger.js';
+export * from './utils/permissionGuard.js';
+export * from './utils/premiumLimits.js';
+export * from './utils/premiumUtils.js';
+export * from './utils/prismaUtils.js';
+export * from './utils/scheduler.js';
+export * from './utils/staffUtils.js';
+export * from './utils/watchdogUtils.js';
 
 // Re-export all handlers
 export * from './handlers/errors.js';
