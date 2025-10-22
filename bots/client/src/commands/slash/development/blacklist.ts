@@ -22,7 +22,7 @@ const command: SlashCommandInterface = {
 			sub
 				.setName('add')
 				.setDescription('Add a blacklist entry')
-				.addStringOption((o) => o.setName('discordid').setDescription('Discord ID').setRequired(true))
+				.addUserOption((o) => o.setName('discordid').setDescription('Discord ID').setRequired(true))
 				.addStringOption((o) =>
 					o
 						.setName('usertype')
@@ -69,13 +69,13 @@ const command: SlashCommandInterface = {
 			sub
 				.setName('get')
 				.setDescription('Get all blacklist entries for a user')
-				.addStringOption((o) => o.setName('discordid').setDescription('Discord ID').setRequired(true)),
+				.addUserOption((o) => o.setName('discordid').setDescription('Discord ID').setRequired(true)),
 		)
 		.addSubcommand((sub) =>
 			sub
 				.setName('remove-user')
 				.setDescription('Completely remove a user from blacklist (and all their entries)')
-				.addStringOption((o) => o.setName('discordid').setDescription('Discord ID').setRequired(true)),
+				.addUserOption((o) => o.setName('discordid').setDescription('Discord ID').setRequired(true)),
 		)
 		.addSubcommand((sub) =>
 			sub
@@ -97,7 +97,7 @@ const command: SlashCommandInterface = {
 
 		try {
 			if (sub === 'add') {
-				const discordId = interaction.options.getString('discordid', true);
+				const discordId = interaction.options.getUser('discordid', true).id;
 				const usertype = interaction.options.getString('usertype', true) as 'FiveM' | 'General';
 				const status = interaction.options.getString('status', true) as 'PERMANENT' | 'TEMPORARY' | 'INDEFINITE';
 				const reason = interaction.options.getString('reason') ?? undefined;
@@ -149,7 +149,7 @@ const command: SlashCommandInterface = {
 			}
 
 			if (sub === 'get') {
-				const discordId = interaction.options.getString('discordid', true);
+				const discordId = interaction.options.getUser('discordid', true).id;
 				const entries = await getUserBlacklistEntries(discordId);
 
 				if (!entries!.length) return interaction.editReply({ content: `\`ℹ️\` No entries found for ${discordId}.` });
@@ -162,7 +162,7 @@ const command: SlashCommandInterface = {
 			}
 
 			if (sub === 'remove-user') {
-				const discordId = interaction.options.getString('discordid', true);
+				const discordId = interaction.options.getUser('discordid', true).id;
 				await deleteBlacklistedUser(discordId);
 
 				return interaction.editReply({ content: `\`🚫\` Completely removed ${discordId} from blacklist.` });
@@ -199,7 +199,7 @@ const command: SlashCommandInterface = {
 			if (sub === 'scan') {
 				const guildId = interaction.options.getString('guildid');
 				const guild = await client.guilds.fetch(guildId!);
-				
+
 				await scanGuild(guild);
 
 				return interaction.editReply({ content: `\`🔍\` Scan completed for guild \`${interaction.guild!.name}\`.` });
