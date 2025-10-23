@@ -144,3 +144,4 @@ package-lock.json
 /.turbo
 /.vscode
 /packages/processer
+/transcripts
