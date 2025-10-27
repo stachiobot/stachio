@@ -8,12 +8,20 @@ datasource db {
 }
 
 model SupportGuilds {
-  guildId    String       @unique
-  guildName  String
-  language   String       @default("en-US")
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  StaffUsers StaffUsers[]
+  guildId      String        @unique
+  guildName    String
+  language     String        @default("en-US")
+  category     GuildCategory @default(COMMUNITY)
+  logChannelId String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  StaffUsers   StaffUsers[]
+}
+
+enum GuildCategory {
+  LANGUAGE
+  COMMUNITY
+  HEAD_SUPPORT
 }
 
 model GuildConfig {
@@ -32,8 +40,8 @@ model GuildConfig {
   redeemedPremiumCode String?
 
   // ⬇ Blacklist check usage tracking
-  blacklistCheckUsage     Int          @default(0)
-  blacklistCheckLastReset DateTime     @default(now())
+  blacklistCheckUsage     Int      @default(0)
+  blacklistCheckLastReset DateTime @default(now())
   Appeal                  Appeal[]
 }
 
@@ -140,11 +148,13 @@ enum BlacklistStatus {
 }
 
 model StaffUsers {
-  id       Int        @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   guildId  String
   userId   String
   username String?
-  role     StaffRoles @default(Trial_Moderator)
+
+  role        StaffRoles @default(Trial_Moderator)
+  departments Json? // store ["Appeals", "Reports", "Stachio"] 
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -156,10 +166,10 @@ enum StaffRoles {
   Owner
   Senior_Administrator
   Administrator
+  Trial_Administrator
   Senior_Moderator
   Moderator
   Trial_Moderator
-  Retired
 }
 
 model Report {
@@ -174,6 +184,7 @@ model Report {
   closedBy         String?
   closedReason     String?
   closedAt         DateTime?
+  transcriptId     String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -200,19 +211,20 @@ model UserReputation {
 
 /// 🧾 APPEAL SYSTEM
 model Appeal {
-  id         Int          @id @default(autoincrement())
-  userId     String
-  username   String?
-  guildId    String?
-  caseId     Int?
-  reason     String
-  evidence   String?      @db.LongText
-  status     AppealStatus @default(PENDING)
-  reviewedBy String?
-  reviewedAt DateTime?
-  response   String?      @db.LongText
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  id           Int          @id @default(autoincrement())
+  userId       String
+  username     String?
+  guildId      String?
+  reason       String
+  evidence     String?      @db.LongText
+  status       AppealStatus @default(PENDING)
+  reviewedBy   String?
+  reviewedAt   DateTime?
+  response     String?      @db.LongText
+  channelId    String?      @unique
+  transcriptId String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
   guild GuildConfig? @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
 }
