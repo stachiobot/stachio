@@ -6,6 +6,7 @@ import {
 	loadCommands,
 	loadEvents,
 	logger,
+	startTranscriptServer,
 } from '@projectdiscord/core';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -14,6 +15,7 @@ const basePath = path.resolve(__dirname, './');
 const client = new BaseClient();
 
 registerErrorHandlers(client);
+startTranscriptServer();
 
 try {
 	await Promise.all([
