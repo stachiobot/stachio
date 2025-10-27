@@ -7,6 +7,7 @@ import {
 	LabelBuilder,
 	ComponentType,
 	PermissionFlagsBits,
+	StringSelectMenuOptionBuilder,
 } from 'discord.js';
 import { BaseClient } from '@projectdiscord/core';
 import { SlashCommandInterface } from '@projectdiscord/shared';
@@ -15,8 +16,8 @@ const command: SlashCommandInterface = {
 	cooldown: 10,
 	isDeveloperOnly: false,
 	data: new SlashCommandBuilder()
-		.setName('report')
-		.setDescription('Submit a report about a user.')
+		.setName('appeal')
+		.setDescription('Submit an appeal for a moderation action through Watchdog.')
 		.setDefaultMemberPermissions(PermissionFlagsBits.SendMessages),
 	async execute(client: BaseClient, interaction: ChatInputCommandInteraction) {
 		const requiredGuild = client.guilds.cache.get(client.config.guilds[0].id);
@@ -35,44 +36,65 @@ const command: SlashCommandInterface = {
 			});
 		}
 
-		const modal = new ModalBuilder().setCustomId('reportModal').setTitle('🛡️ Stachio Watchdog — User Report');
+		const modal = new ModalBuilder().setCustomId('watchdogAppealModal').setTitle('🐾 Watchdog Appeal Submission');
 
 		modal.addTextDisplayComponents(
 			new TextDisplayBuilder({
 				content:
-					'Please fill out all fields accurately. False or misleading reports can lead to action against your account.',
+					'Please provide as much detail as possible. Watchdog appeals are reviewed manually by the moderation team.\n\n⚠️ False or troll appeals may result in disciplinary action.',
 			}),
 		);
 
 		modal.addLabelComponents(
 			new LabelBuilder({
-				label: '👤 Reported User (Discord ID)',
+				label: 'Punishment Type',
+				component: {
+					type: ComponentType.StringSelect,
+					custom_id: 'punishmentType',
+					placeholder: 'Select the punishment type...',
+					required: true,
+					options: [
+						new StringSelectMenuOptionBuilder()
+							.setLabel('Temporary')
+							.setValue('temporary')
+							.setDescription('Temporary ban.')
+							.toJSON(),
+						new StringSelectMenuOptionBuilder()
+							.setLabel('Indefinite')
+							.setValue('indefinite')
+							.setDescription('Indefinite')
+							.toJSON(),
+					],
+				},
+			}),
+			new LabelBuilder({
+				label: 'Date or Time of Punishment',
 				component: {
 					type: ComponentType.TextInput,
-					custom_id: 'reportedUser',
+					custom_id: 'punishmentDate',
 					style: TextInputStyle.Short,
-					required: true,
-					placeholder: 'e.g. 123456789012345678',
+					required: false,
+					placeholder: 'Example: October 25, 2025 (optional)',
 				},
 			}),
 			new LabelBuilder({
-				label: '📄 Describe the Issue',
+				label: 'Reason for Appeal',
 				component: {
 					type: ComponentType.TextInput,
-					custom_id: 'reason',
+					custom_id: 'appealReason',
 					style: TextInputStyle.Paragraph,
 					required: true,
-					placeholder: 'Explain what happened in clear detail. Include dates or context if relevant.',
+					placeholder: 'Explain why your punishment should be reconsidered...',
 				},
 			}),
 			new LabelBuilder({
-				label: '🧾 Evidence (fullscreen, hide private information)',
+				label: 'Additional Context or Evidence',
 				component: {
 					type: ComponentType.TextInput,
-					custom_id: 'evidence',
+					custom_id: 'appealEvidence',
 					style: TextInputStyle.Paragraph,
-					required: true,
-					placeholder: 'Links, screenshots, message IDs, or any relevant proof.',
+					required: false,
+					placeholder: 'Provide any relevant proof, links, or screenshots.',
 				},
 			}),
 		);
