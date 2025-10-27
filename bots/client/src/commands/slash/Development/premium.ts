@@ -37,7 +37,7 @@ const command: SlashCommandInterface = {
 		.addSubcommand((sub) =>
 			sub
 				.setName('renew')
-				.setDescription('Extend a guild’s premium by a number of days')
+				.setDescription('Extend a guild\'s premium by a number of days')
 				.addStringOption((o) => o.setName('guildid').setDescription('Guild ID').setRequired(true))
 				.addIntegerOption((o) => o.setName('days').setDescription('Number of days to extend').setRequired(true)),
 		),
