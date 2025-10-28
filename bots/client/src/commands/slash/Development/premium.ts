@@ -1,8 +1,8 @@
 import { SlashCommandInterface } from '@projectdiscord/shared';
-import { BaseClient, stopGuildScan } from '@projectdiscord/core';
+import { BaseClient, hasStaffRole, stopGuildScan } from '@projectdiscord/core';
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js';
-import { randomUUID } from 'crypto';
-import { PremiumTier } from '@prisma/client';
+import { nanoid } from 'nanoid';
+import { PremiumTier, StaffRoles } from '@prisma/client';
 
 const command: SlashCommandInterface = {
 	cooldown: 5,
@@ -10,7 +10,7 @@ const command: SlashCommandInterface = {
 	data: new SlashCommandBuilder()
 		.setName('premium')
 		.setDescription('Manage premium tiers and codes')
-		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+		.setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
 		.addSubcommand((sub) =>
 			sub
 				.setName('create-code')
@@ -37,7 +37,7 @@ const command: SlashCommandInterface = {
 		.addSubcommand((sub) =>
 			sub
 				.setName('renew')
-				.setDescription('Extend a guild\'s premium by a number of days')
+				.setDescription("Extend a guild's premium by a number of days")
 				.addStringOption((o) => o.setName('guildid').setDescription('Guild ID').setRequired(true))
 				.addIntegerOption((o) => o.setName('days').setDescription('Number of days to extend').setRequired(true)),
 		),
@@ -46,11 +46,17 @@ const command: SlashCommandInterface = {
 		await interaction.deferReply({ flags: ['Ephemeral'] });
 		const sub = interaction.options.getSubcommand();
 
+		const hasPermission = await hasStaffRole(interaction.guildId!, interaction.user.id, [StaffRoles.Owner]);
+		if (!hasPermission) {
+			await interaction.editReply('`🚫` You must be an **Owner** to use this command.');
+			return;
+		}
+
 		try {
 			if (sub === 'create-code') {
 				const tier = interaction.options.getString('tier', true) as PremiumTier;
 				const duration = interaction.options.getInteger('duration', true);
-				const code = randomUUID();
+				const code = nanoid();
 
 				await client.prisma.premiumCode.create({
 					data: { code, tier, duration },
