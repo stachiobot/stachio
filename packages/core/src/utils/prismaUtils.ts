@@ -1,4 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { BlacklistStatus, PrismaClient, UserType, UserCategory } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
 /**
@@ -17,23 +18,26 @@ export async function upsertBlacklistedUser(discordId: string, username: string)
  */
 export async function addBlacklistEntry(
 	discordId: string,
+	username: string,
 	entryData: {
-		usertype: 'FiveM' | 'General';
-		status: 'PERMANENT' | 'TEMPORARY' | 'INDEFINITE';
+		category: UserCategory;
+		usertype: UserType;
+		status: BlacklistStatus;
 		community?: string;
 		reason?: string;
 		reportedBy?: string;
 		evidence?: string;
-		expiresAt?: Date;
+		expiresAt?: Date | null;
 	},
 ) {
-	const user = await upsertBlacklistedUser(discordId, entryData.reportedBy ?? 'Unknown');
+	const user = await upsertBlacklistedUser(discordId, username);
 
 	return prisma.blacklistEntry.create({
 		data: {
 			...entryData,
 			userId: user.id,
 		},
+		include: { user: true },
 	});
 }
 
@@ -43,7 +47,9 @@ export async function addBlacklistEntry(
 export async function updateBlacklistEntry(
 	entryId: number,
 	updates: Partial<{
-		status: 'PERMANENT' | 'TEMPORARY' | 'INDEFINITE';
+		category: UserCategory;
+		usertype: UserType;
+		status: BlacklistStatus;
 		community: string;
 		reason: string;
 		reportedBy: string;
@@ -55,6 +61,7 @@ export async function updateBlacklistEntry(
 	return prisma.blacklistEntry.update({
 		where: { id: entryId },
 		data: updates,
+		include: { user: true },
 	});
 }
 
@@ -68,7 +75,7 @@ export async function deleteBlacklistEntry(entryId: number) {
 }
 
 /**
- * Delete a blacklisted user and all their entries
+ * Delete a blacklisted user & their entries
  */
 export async function deleteBlacklistedUser(discordId: string) {
 	const user = await prisma.blacklistedUser.findUnique({
@@ -78,19 +85,13 @@ export async function deleteBlacklistedUser(discordId: string) {
 
 	if (!user) return null;
 
-	// Delete entries first
-	await prisma.blacklistEntry.deleteMany({
-		where: { userId: user.id },
-	});
+	await prisma.blacklistEntry.deleteMany({ where: { userId: user.id } });
 
-	// Delete user
-	return prisma.blacklistedUser.delete({
-		where: { discordId },
-	});
+	return prisma.blacklistedUser.delete({ where: { discordId } });
 }
 
 /**
- * Get a blacklisted user with their entries and metadata
+ * Get user w/ blacklist entries
  */
 export async function getBlacklistedUser(discordId: string) {
 	return prisma.blacklistedUser.findUnique({
@@ -100,8 +101,7 @@ export async function getBlacklistedUser(discordId: string) {
 }
 
 /**
- * Get all blacklisted users with their entries
- * (useful for dashboards or exports)
+ * Get all blacklisted users w/ entries
  */
 export async function getAllBlacklistedUsers() {
 	return prisma.blacklistedUser.findMany({
@@ -111,18 +111,18 @@ export async function getAllBlacklistedUsers() {
 }
 
 /**
- * Find active blacklist entries (not expired, still active)
+ * Get active blacklist entries only
  */
 export async function getActiveBlacklistEntries() {
 	return prisma.blacklistEntry.findMany({
 		where: {
 			active: true,
 			OR: [
-				{ status: 'PERMANENT' },
-				{ status: 'INDEFINITE' },
+				{ status: BlacklistStatus.PERMANENT },
+				{ status: BlacklistStatus.INDEFINITE },
 				{
-					status: 'TEMPORARY',
-					expiresAt: { gt: new Date() }, // still valid
+					status: BlacklistStatus.TEMPORARY,
+					expiresAt: { gt: new Date() },
 				},
 			],
 		},
@@ -131,42 +131,36 @@ export async function getActiveBlacklistEntries() {
 }
 
 /**
- * Get a specific blacklist entry by ID
+ * Get blacklist entry by ID
  */
 export async function getBlacklistEntryById(entryId: number) {
 	return prisma.blacklistEntry.findUnique({
 		where: { id: entryId },
-		include: {
-			user: true, // include linked user for context
-		},
+		include: { user: true },
 	});
 }
 
 /**
- * Get all blacklist entries for a user
+ * Get all entries for a specific user
  */
 export async function getUserBlacklistEntries(discordId: string) {
 	const user = await prisma.blacklistedUser.findUnique({
 		where: { discordId },
-		include: { blacklists: true }, // includes all related entries
+		include: { blacklists: true },
 	});
 
-	if (!user) {
-		return null; // user not found
-	}
-
-	return user.blacklists; // array of entries
+	return user?.blacklists ?? null;
 }
 
 /**
- * Count blacklisted users
+ * Count total blacklisted users
  */
 export async function countBlacklistedUsers() {
 	return prisma.blacklistedUser.count();
 }
 
 /**
- * Count active entries grouped by type
+ * Count entries grouped by usertype
  */
 export async function countEntriesByType() {
 	return prisma.blacklistEntry.groupBy({
