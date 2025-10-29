@@ -164,7 +164,7 @@ export async function actionUser(member: GuildMember) {
 						)
 						.setTitle('🛡️ Stachio - Blacklist Notification')
 						.setThumbnail(
-							'https://github.com/MilkshakeCollective/stachio-web/blob/master/public/images/logo.png?raw=true',
+							'https://github.com/stachiobot/web/blob/master/public/images/logo.png?raw=true',
 						)
 						.addFields({
 							name: 'History',

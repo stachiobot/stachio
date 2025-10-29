@@ -85,25 +85,61 @@ npm install
 ### 3. Setup environment variables (.env) (ROOT)
 
 ```env
-# Database
-DATABASE_URL="mysql://<username>:<password>@<host>:<port>/<database>"
+# ================================
+# Database Configuration
+# ================================
+DATABASE_URL="mysql://USERNAME:PASSWORD@HOST:PORT/DATABASE_NAME"
 
+# ================================
+# Dashboard Configuration
+# ================================
+DASHBOARD_PORT=80
+DASHBOARD_DOMAIN="https://yourdomain.com"
+DASHBOARD_REDIRECT_URI="/discord/callback"
+DASHBOARD_LICENSE="YOUR-LICENSE-KEY"
+
+# ================================
+# Transcript Configuration
+# ================================
+TRANSCRIPT_PORT=5050
+TRANSCRIPT_DOMAIN="https://logs.yourdomain.com"
+
+# ================================
 # Main Client Bot
-CLIENT_TOKEN="your-client-bot-token"
-CLIENT_ID="your-client-id"
-CLIENT_SECRET="your-client-secret"
-CLIENT_PREFIX="?"
+# ================================
+CLIENT_TOKEN="YOUR-MAIN-BOT-TOKEN"
+CLIENT_ID="YOUR-MAIN-BOT-ID"
+CLIENT_SECRET="YOUR-MAIN-BOT-SECRET"
+CLIENT_PREFIX="s?"
 
+# ================================
 # Helper Bot (optional)
-HELPER_CLIENT_TOKEN="your-helper-bot-token"
-HELPER_CLIENT_ID="your-helper-client-id"
-HELPER_CLIENT_SECRET="your-helper-client-secret"
-HELPER_CLIENT_PREFIX="?"
+# ================================
+HELPER_CLIENT_TOKEN="YOUR-HELPER-BOT-TOKEN"
+HELPER_CLIENT_ID="YOUR-HELPER-BOT-ID"
+HELPER_CLIENT_SECRET="YOUR-HELPER-BOT-SECRET"
+HELPER_CLIENT_PREFIX="s?"
 
-# Error handling
+# ================================
+# Error & Logging
+# ================================
 ENABLE_ERROR_HANDLER=true
-ENABLE_SEND_TO_WEBHOOK=true
-ERROR_WEBHOOK_URL="your-discord-webhook-url"
+ENABLE_SEND_TO_WEBHOOK=false
+ERROR_WEBHOOK_URL="YOUR-ERROR-WEBHOOK-URL"
+
+# ================================
+# Role, Channels, and Guild IDs
+# ================================
+# REPORT
+REPORT_CATEGORY_ID="YOUR-REPORT-CATEGORY-ID"
+REPORT_STAFF_ROLE_ID="YOUR-REPORT-STAFF-ROLE-ID"
+
+# APPEAL
+APPEAL_CATEGORY_ID="YOUR-APPEAL-CATEGORY-ID"
+APPEAL_STAFF_ROLE_ID="YOUR-APPEAL-STAFF-ROLE-ID"
+
+# Stachio (Main Staff Role)
+STACHIO_STAFF_ROLE_ID="YOUR-STACHIO-STAFF-ROLE-ID"
 ```
 
 ### 4. Run a bot
@@ -126,8 +162,6 @@ From root:
 npm run start:bot                  # Run main client bot
 npm run start:helper               # Run helper bot
 npm run build                      # Build all packages & bots
-npm run lint                       # Run linter
-npm run format                     # Run Formatter
 ```
 
 ---
