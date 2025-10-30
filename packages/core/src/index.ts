@@ -18,7 +18,6 @@ export * from './utils/permissionGuard.js';
 export * from './utils/premiumLimits.js';
 export * from './utils/premiumUtils.js';
 export * from './utils/prismaUtils.js';
-export * from './utils/reputation.js';
 export * from './utils/scheduler.js';
 export * from './utils/staffUtils.js';
 export * from './utils/watchdogUtils.js';

@@ -145,3 +145,4 @@ package-lock.json
 /.vscode
 /packages/processer
 /transcripts
+/packages/core/prisma
