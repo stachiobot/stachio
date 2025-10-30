@@ -83,9 +83,6 @@ const command: SlashCommandInterface = {
 						create: {
 							generalPunishment: PunishmentType.BAN,
 							fivemPunishment: PunishmentType.WARN,
-							discordPunishment: PunishmentType.KICK,
-							robloxPunishment: PunishmentType.WARN,
-							otherGamePunishment: PunishmentType.WARN,
 							marketplacePunishment: PunishmentType.BAN,
 						},
 					},
@@ -116,9 +113,6 @@ const command: SlashCommandInterface = {
 			const fieldMap: Record<string, keyof typeof watchdog> = {
 				General: 'generalPunishment',
 				FiveM: 'fivemPunishment',
-				Discord: 'discordPunishment',
-				Roblox: 'robloxPunishment',
-				OtherGame: 'otherGamePunishment',
 				Marketplace: 'marketplacePunishment',
 			};
 

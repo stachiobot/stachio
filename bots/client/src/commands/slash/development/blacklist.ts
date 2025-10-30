@@ -188,7 +188,7 @@ const command: SlashCommandInterface = {
 			if (!entries?.length) return interaction.editReply({ content: `\`ℹ️\` No blacklist entries found.` });
 
 			const list = entries
-				.map((e) => `• **#${e.id}** | ${e.status} | ${e.category} | ${e.reason ?? 'No reason'}`)
+				.map((e) => `• **#${e.id}** | ${e.status} | ${e.usercategory} | ${e.reason ?? 'No reason'}`)
 				.join('\n');
 
 			return interaction.editReply({ content: `**Entries:**\n${list}` });
@@ -212,7 +212,7 @@ const command: SlashCommandInterface = {
 				.setDescription(
 					[
 						`**User:** ${entry.user?.username} (${entry.user?.discordId})`,
-						`**Category:** ${entry.category}`,
+						`**Category:** ${entry.usercategory}`,
 						`**Type:** ${entry.usertype}`,
 						`**Status:** ${entry.status}`,
 						`**Reason:** ${entry.reason ?? 'None'}`,
