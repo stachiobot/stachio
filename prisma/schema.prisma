@@ -197,20 +197,6 @@ enum ReportStatus {
   CLOSED
 }
 
-/// 🏆 REPUTATION / TRUST SCORE SYSTEM
-model UserReputation {
-  id         Int      @id @default(autoincrement())
-  userId     String   @unique
-  username   String?
-  trustScore Int      @default(100) // 0-100 baseline
-  strikes    Int      @default(0)
-  positive   Int      @default(0)
-  negative   Int      @default(0)
-  notes      String?  @db.LongText
-  updatedAt  DateTime @updatedAt
-  createdAt  DateTime @default(now())
-}
-
 /// 🧾 APPEAL SYSTEM
 model Appeal {
   id           Int          @id @default(autoincrement())
