@@ -197,7 +197,6 @@ enum ReportStatus {
   CLOSED
 }
 
-/// 🧾 APPEAL SYSTEM
 model Appeal {
   id           Int          @id @default(autoincrement())
   userId       String
