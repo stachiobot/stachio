@@ -129,7 +129,6 @@ const event: EventInterface<'interactionCreate'> = {
 						username: interaction.user.username,
 						reason,
 						evidence,
-						caseId: caseId ? parseInt(caseId) : null,
 					},
 				});
 
