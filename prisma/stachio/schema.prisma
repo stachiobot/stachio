@@ -1,63 +1,25 @@
-generator client {
+generator clientStachio {
   provider = "prisma-client-js"
+  output   = "../../packages/core/prisma/stachio"
 }
 
-datasource db {
+datasource stachio_db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
-}
-
-model SupportGuilds {
-  guildId      String        @unique
-  guildName    String
-  language     String        @default("en-US")
-  category     GuildCategory @default(COMMUNITY)
-  logChannelId String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  StaffUsers   StaffUsers[]
-}
-
-enum GuildCategory {
-  LANGUAGE
-  COMMUNITY
-  HEAD_SUPPORT
+  url      = env("DATABASE_URL_STACHIO")
 }
 
 model GuildConfig {
   guildId            String          @unique
   guildName          String?
   language           String          @default("en-US")
-  broadcastChannelId String?
   errorLogChannelId  String?
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
   WatchdogConfig     WatchdogConfig?
 
-  // 🔑 Premium fields
-  premiumTier         PremiumTier @default(Free)
-  premiumExpiresAt    DateTime?
-  redeemedPremiumCode String?
-
   // ⬇ Blacklist check usage tracking
   blacklistCheckUsage     Int      @default(0)
   blacklistCheckLastReset DateTime @default(now())
-  Appeal                  Appeal[]
-}
-
-model PremiumCode {
-  code      String      @id @default(cuid())
-  tier      PremiumTier
-  duration  Int // In days
-  createdAt DateTime    @default(now())
-  redeemed  Boolean     @default(false)
-}
-
-enum PremiumTier {
-  Free
-  Silver
-  Gold
-  Platinum
 }
 
 model WatchdogConfig {
@@ -106,7 +68,7 @@ model BlacklistEntry {
   community    String?
   reason       String?
   reportedBy   String?
-  evidence     String?         @db.LongText
+  evidence     String?         @stachio_db.LongText
 
   active    Boolean   @default(true)
   expiresAt DateTime?
@@ -149,31 +111,6 @@ enum BlacklistStatus {
   INDEFINITE
 }
 
-model StaffUsers {
-  id       Int     @id @default(autoincrement())
-  guildId  String
-  userId   String
-  username String?
-
-  role        StaffRoles @default(Trial_Moderator)
-  departments Json? // store ["Appeals", "Reports", "Stachio"] 
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  guild SupportGuilds @relation(fields: [guildId], references: [guildId])
-}
-
-enum StaffRoles {
-  Owner
-  Senior_Administrator
-  Administrator
-  Trial_Administrator
-  Senior_Moderator
-  Moderator
-  Trial_Moderator
-}
-
 model Report {
   id               Int          @id @default(autoincrement())
   reporterId       String
@@ -203,17 +140,15 @@ model Appeal {
   username     String?
   guildId      String?
   reason       String
-  evidence     String?      @db.LongText
+  evidence     String?      @stachio_db.LongText
   status       AppealStatus @default(PENDING)
   reviewedBy   String?
   reviewedAt   DateTime?
-  response     String?      @db.LongText
+  response     String?      @stachio_db.LongText
   channelId    String?      @unique
   transcriptId String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
-
-  guild GuildConfig? @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
 }
 
 enum AppealStatus {

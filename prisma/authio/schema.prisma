@@ -1,0 +1,18 @@
+generator clientAuthio {
+    provider = "prisma-client-js"
+    output   = "../../packages/core/prisma/authio"
+}
+
+datasource authio_db {
+    provider = "mysql"
+    url      = env("DATABASE_URL_AUTHIO")
+}
+
+model GuildConfig {
+    guildId            String   @unique
+    guildName          String?
+    language           String   @default("en-US")
+    errorLogChannelId  String?
+    createdAt          DateTime @default(now())
+    updatedAt          DateTime @updatedAt
+}

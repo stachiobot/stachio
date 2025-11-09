@@ -15,12 +15,16 @@ export * from './version.js';
 export * from './utils/guildActionLog.js';
 export * from './utils/guildErrLogger.js';
 export * from './utils/permissionGuard.js';
-export * from './utils/premiumLimits.js';
-export * from './utils/premiumUtils.js';
-export * from './utils/prismaUtils.js';
-export * from './utils/scheduler.js';
-export * from './utils/staffUtils.js';
-export * from './utils/watchdogUtils.js';
+// export * from './utils/premiumLimits.js';
+// export * from './utils/premiumUtils.js';
+// export * from './utils/prismaUtils.js';
+// export * from './utils/scheduler.js';
+// export * from './utils/staffUtils.js';
+// export * from './utils/watchdogUtils.js';
+
+// DB
+export * from './utils/db/global.js'
+export * from './utils/db/stachio.js'
 
 // Re-export all handlers
 export * from './handlers/errors.js';

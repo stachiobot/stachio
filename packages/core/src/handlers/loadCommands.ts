@@ -97,7 +97,7 @@ export async function loadCommands(
 			// ----------------- DEV / GUILD COMMANDS -----------------
 			let allGuilds: ObjectNameIDArray[] = guilds || [];
 
-			const supporterGuilds = await client.prisma.supportGuilds.findMany({
+			const supporterGuilds = await client.db.global.supportGuilds.findMany({
 				select: { guildId: true, guildName: true },
 			});
 

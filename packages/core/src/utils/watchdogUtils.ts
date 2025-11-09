@@ -9,7 +9,7 @@ import {
 	PermissionsBitField,
 } from 'discord.js';
 import { PrismaClient, PunishmentType, UserCategory } from '@prisma/client';
-import { config, logger, permissionGuard } from '@projectdiscord/core';
+import { BaseClient, config, logger, permissionGuard } from '@projectdiscord/core';
 
 const prisma = new PrismaClient();
 
@@ -57,7 +57,7 @@ export async function checkBlacklist(discordId: string) {
 /**
  * Scan a guild for blacklisted users and take action in batches.
  */
-export async function scanGuild(guild: Guild) {
+export async function scanGuild(client: BaseClient, guild: Guild) {
 	try {
 		await guild.members.fetch();
 		const members = guild.members.cache;
@@ -80,7 +80,7 @@ export async function scanGuild(guild: Guild) {
 					const { activeEntries } = await checkBlacklist(member.id);
 					if (!activeEntries.length) continue;
 
-					await actionUser(member);
+					await actionUser(client, member);
 
 					await new Promise((res) => setTimeout(res, delayMs));
 				} catch (err) {
@@ -100,7 +100,7 @@ export async function scanGuild(guild: Guild) {
 /**
  * Apply the correct punishment to a user based on their blacklist entries and WatchdogConfig.
  */
-export async function actionUser(member: GuildMember) {
+export async function actionUser(client: BaseClient,member: GuildMember) {
 	const user = await prisma.blacklistedUser.findUnique({
 		where: { discordId: member.id },
 		include: { blacklists: true },
@@ -162,7 +162,7 @@ export async function actionUser(member: GuildMember) {
 										? 0xe74c3c
 										: config.colors.primary,
 						)
-						.setTitle('🛡️ Stachio - Blacklist Notification')
+						.setTitle(`🛡️ ${client.config.stachio.client_username} - Blacklist Notification`)
 						.setThumbnail(
 							'https://github.com/stachiobot/web/blob/master/public/images/logo.png?raw=true',
 						)
@@ -179,7 +179,7 @@ export async function actionUser(member: GuildMember) {
 						})
 						.setDescription(
 							[
-								'You have been blacklisted by **Stachio** for rule violations.\n\n',
+								`You have been blacklisted by **${client.config.stachio.client_username}** for rule violations.\n\n`,
 								'Please review the rules and take corrective action to avoid further punishment.',
 							].join('\n'),
 						)
@@ -272,7 +272,7 @@ export async function actionUser(member: GuildMember) {
 								)
 								.join('\n'),
 						})
-						.setFooter({ text: 'Stachio Watchdog • Log' })
+						.setFooter({ text: `${client.config.stachio.client_username} Watchdog • Log` })
 						.setTimestamp(),
 				],
 			});

@@ -4,7 +4,7 @@ import { BaseClient } from '@projectdiscord/core';
 type Tier = keyof typeof premiumLimits;
 
 export async function getGuildPremium(client: BaseClient, guildId: string) {
-	const guild = await client.prisma.guildConfig.findUnique({
+	const guild = await client.db.global.premiumGuildConfig.findUnique({
 		where: { guildId },
 		select: { premiumTier: true, premiumExpiresAt: true },
 	});
